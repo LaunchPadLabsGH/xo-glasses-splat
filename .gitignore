@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
+# Data and run outputs (never committed: raw footage may contain personal data)
+data/
+runs/
+*.part
+
+# Large model/scene outputs live in runs/; only curated web assets go in docs/assets/
+*.ckpt
+*.pt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
