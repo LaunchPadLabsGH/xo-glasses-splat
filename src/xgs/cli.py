@@ -66,6 +66,15 @@ def export(
 
 
 @app.command()
+def scenes() -> None:
+    """Re-apply titles and attribution from configs/scenes.yaml to all exported scenes."""
+    from xgs.report.export import refresh_scene_info
+
+    for name in refresh_scene_info():
+        typer.echo(f"updated {name}")
+
+
+@app.command()
 def report(run_dir: Path = RunOpt) -> None:
     """Write results.json, results.md and plots for a run."""
     from xgs.report.build import build_report

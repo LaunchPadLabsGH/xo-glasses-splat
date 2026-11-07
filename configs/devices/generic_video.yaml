@@ -1,5 +1,5 @@
 # Any video with unknown calibration: intrinsics are self-calibrated by SfM.
-name: Generic video (unknown calibration)
+name: Handheld video (calibration estimated from footage)
 kind: video
 calibration: null
 rolling_shutter_readout_ms: null

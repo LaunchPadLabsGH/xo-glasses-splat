@@ -149,6 +149,7 @@ def export_scene(run: Path, cfg: dict, name: str, web_root: Path | None = None) 
     meta = {
         "name": name,
         "source": cfg["device_profile"].get("name"),
+        "info": scene_info(name),
         "units": units,
         "extent": round(extent, 3),
         "layers": layers,
@@ -162,10 +163,39 @@ def export_scene(run: Path, cfg: dict, name: str, web_root: Path | None = None) 
     return out
 
 
+def scene_info(name: str, path: Path | None = None) -> dict:
+    """Display title and attribution for a scene from configs/scenes.yaml (empty if not listed)."""
+    import yaml
+
+    path = path or REPO_ROOT / "configs" / "scenes.yaml"
+    if not path.exists():
+        return {}
+    with open(path) as f:
+        return (yaml.safe_load(f) or {}).get(name, {}) or {}
+
+
 def _update_index(web_dir: Path, name: str, source: str | None) -> None:
-    """docs/assets/scenes.json lists the scenes the viewer can open."""
+    """docs/assets/scenes.json lists the scenes the viewer can open, in display order."""
     idx_path = web_dir / "scenes.json"
     idx = json.loads(idx_path.read_text()) if idx_path.exists() else {"scenes": []}
-    idx["scenes"] = [s for s in idx["scenes"] if s["name"] != name] + [{"name": name, "source": source}]
-    idx["scenes"].sort(key=lambda s: s["name"])
+    entry = {"name": name, "source": source}
+    info = scene_info(name)
+    if info.get("title"):
+        entry["title"] = info["title"]
+    idx["scenes"] = [s for s in idx["scenes"] if s["name"] != name] + [entry]
+    idx["scenes"].sort(key=lambda s: (scene_info(s["name"]).get("order", 99), s["name"]))
     idx_path.write_text(json.dumps(idx, indent=1))
+
+
+def refresh_scene_info(web_dir: Path | None = None) -> list[str]:
+    """Re-apply titles and attribution from configs/scenes.yaml to every exported scene."""
+    web_dir = Path(web_dir or REPO_ROOT / "docs" / "assets")
+    done = []
+    for meta_path in sorted(web_dir.glob("*/scene.json")):
+        name = meta_path.parent.name
+        meta = json.loads(meta_path.read_text())
+        meta["info"] = scene_info(name)
+        meta_path.write_text(json.dumps(meta, indent=1, default=str))
+        _update_index(web_dir, name, meta.get("source"))
+        done.append(name)
+    return done

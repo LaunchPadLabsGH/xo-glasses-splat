@@ -1,0 +1,31 @@
+# Display names and attribution for published scenes, keyed by the name passed
+# to `xgs export --name`. CC BY / CC BY-SA sources must be credited wherever
+# their derived content is shown, so the viewer displays `attribution` with a
+# link to the licence. Apply edits to already-exported scenes with `xgs scenes`.
+
+dc-glass:
+  title: Washington DC waterfront, real Google Glass footage
+  order: 1
+  attribution: '"Wintry DC through Google Glass" by brownpau'
+  source_url: https://commons.wikimedia.org/wiki/File:Wintry_DC_through_Google_Glass.webm
+  licence: CC BY 3.0
+  licence_url: https://creativecommons.org/licenses/by/3.0/
+  note: Faces blurred and reduced to a 3D reconstruction. Derived from the original video.
+
+london-walk:
+  title: Canada Water, London, 4K walking video
+  order: 2
+  attribution: '"Canada Water and Rafter Walk in Southwark, London Docklands" by Acabashi'
+  source_url: https://commons.wikimedia.org/wiki/File:Canada_Water_and_Rafter_Walk_in_Southwark,_London_Docklands.webm
+  licence: CC BY-SA 4.0
+  licence_url: https://creativecommons.org/licenses/by-sa/4.0/
+  note: Faces blurred and reduced to a 3D reconstruction. This derived 3D scene is shared under CC BY-SA 4.0.
+
+tum-desk:
+  title: Desk benchmark, handheld camera with motion-capture ground truth
+  order: 3
+  attribution: TUM RGB-D benchmark (freiburg1_desk), Sturm et al., IROS 2012
+  source_url: https://cvg.cit.tum.de/data/datasets/rgbd-dataset
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  note: Derived from the original image sequence.

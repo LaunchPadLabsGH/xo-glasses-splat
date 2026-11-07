@@ -143,5 +143,14 @@
    "downscale": 2
   }
  },
- "generated_utc": "2026-11-07T01:16:15+00:00"
+ "generated_utc": "2026-11-07T01:16:15+00:00",
+ "info": {
+  "title": "Washington DC waterfront, real Google Glass footage",
+  "order": 1,
+  "attribution": "\"Wintry DC through Google Glass\" by brownpau",
+  "source_url": "https://commons.wikimedia.org/wiki/File:Wintry_DC_through_Google_Glass.webm",
+  "licence": "CC BY 3.0",
+  "licence_url": "https://creativecommons.org/licenses/by/3.0/",
+  "note": "Faces blurred and reduced to a 3D reconstruction. Derived from the original video."
+ }
 }

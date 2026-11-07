@@ -166,5 +166,14 @@
    "downscale": 2
   }
  },
- "generated_utc": "2026-11-07T01:09:13+00:00"
+ "generated_utc": "2026-11-07T01:09:13+00:00",
+ "info": {
+  "title": "Desk benchmark, handheld camera with motion-capture ground truth",
+  "order": 3,
+  "attribution": "TUM RGB-D benchmark (freiburg1_desk), Sturm et al., IROS 2012",
+  "source_url": "https://cvg.cit.tum.de/data/datasets/rgbd-dataset",
+  "licence": "CC BY 4.0",
+  "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+  "note": "Derived from the original image sequence."
+ }
 }
