@@ -108,6 +108,6 @@ versions. Re-runs skip unchanged stages, which keeps results reproducible.
 
 ## Licence
 
-Copyright © 2026 X-O Labs Ltd. All rights reserved. Shared for evaluation; see [LICENSE](LICENSE).
+Shared for evaluation; see [LICENSE](LICENSE).
 Third-party components are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and demo data
 attribution in [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
