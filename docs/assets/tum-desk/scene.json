@@ -2,8 +2,14 @@
  "name": "tum-desk",
  "source": "TUM RGB-D fr1 (handheld, motion-capture ground truth)",
  "units": "metres (scaled by alignment to ground truth)",
- "extent": 1.613,
+ "extent": 1.616,
  "layers": [
+  {
+   "id": "refined",
+   "label": "Refined (Gaussian Splatting)",
+   "file": "refined.splat",
+   "count": 424047
+  },
   {
    "id": "live",
    "label": "Live map (on-device replay)",
@@ -14,25 +20,25 @@
    "id": "sparse",
    "label": "Sparse map (SfM points)",
    "file": "sparse.splat",
-   "count": 22827
+   "count": 23056
   },
   {
    "id": "confidence",
    "label": "Confidence (red = weakly observed)",
    "file": "confidence.splat",
-   "count": 22827
+   "count": 23056
   }
  ],
  "start": {
   "position": [
-   0.8881,
-   0.1793,
-   -0.3374
+   0.9468,
+   0.2519,
+   -0.3876
   ],
   "direction": [
-   -0.338,
-   -0.1456,
-   -0.9298
+   -0.4023,
+   -0.2317,
+   -0.8857
   ]
  },
  "metrics": {
@@ -41,20 +47,20 @@
    "events": 0
   },
   "confidence": {
-   "points": 22827,
-   "low_confidence_pct": 13.1,
+   "points": 23056,
+   "low_confidence_pct": 13.0,
    "median_triangulation_angle_deg": 8.1,
-   "median_confidence": 0.65
+   "median_confidence": 0.654
   },
   "evaluate": {
    "sfm_ate": {
     "matched": 219,
-    "ate_rmse_m": 0.0351,
-    "ate_median_m": 0.0223,
-    "ate_max_m": 0.1244,
+    "ate_rmse_m": 0.0305,
+    "ate_median_m": 0.0205,
+    "ate_max_m": 0.0789,
     "gt_path_length_m": 9.377,
-    "ate_pct_of_path": 0.37,
-    "sim3_scale": 0.2275
+    "ate_pct_of_path": 0.33,
+    "sim3_scale": 0.2285
    },
    "live_ate": {
     "matched": 140,
@@ -91,19 +97,19 @@
    "frames_processed": 407,
    "keyframes": 140,
    "live_map_points": 42298,
-   "latency_ms_p50": 11.1,
-   "latency_ms_p95": 29.0,
-   "latency_ms_max": 190.8,
+   "latency_ms_p50": 7.3,
+   "latency_ms_p95": 16.0,
+   "latency_ms_max": 92.5,
    "budget_ms_at_ingest_fps": 33.3,
-   "pct_within_ingest_budget": 97.1,
+   "pct_within_ingest_budget": 99.3,
    "budget_ms_at_30fps": 33.3,
-   "pct_within_30fps_budget": 97.1,
+   "pct_within_30fps_budget": 99.3,
    "frames_not_tracked": 33,
    "map_resets": 2,
    "intrinsics_source": "device calibration"
   },
   "preview": {
-   "sparse_splats": 22827,
+   "sparse_splats": 23056,
    "live_splats": 42298
   },
   "privacy": {
@@ -127,10 +133,10 @@
    "images_input": 220,
    "images_registered": 219,
    "registered_pct": 99.5,
-   "points3d": 22827,
-   "mean_reprojection_error_px": 0.921,
-   "mean_track_length": 6.26,
-   "mean_observations_per_image": 652.3,
+   "points3d": 23056,
+   "mean_reprojection_error_px": 0.92,
+   "mean_track_length": 6.24,
+   "mean_observations_per_image": 657.4,
    "camera": {
     "1": {
      "model": "OPENCV",
@@ -146,7 +152,19 @@
      ]
     }
    }
+  },
+  "splat": {
+   "iterations": 7000,
+   "train_time_s": 140.3,
+   "gaussians": 572042,
+   "train_views": 191,
+   "test_views": 28,
+   "test_psnr_db": 20.42,
+   "test_ssim": 0.8011,
+   "gpu": "NVIDIA GeForce RTX 5070",
+   "peak_gpu_mem_gb": 1.09,
+   "downscale": 2
   }
  },
- "generated_utc": "2026-11-07T00:26:02+00:00"
+ "generated_utc": "2026-11-07T01:09:13+00:00"
 }

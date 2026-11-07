@@ -1,0 +1,147 @@
+{
+ "name": "dc-glass",
+ "source": "Google Glass (consumer video export)",
+ "units": "arbitrary (monocular reconstruction has no absolute scale)",
+ "extent": 8.268,
+ "layers": [
+  {
+   "id": "refined",
+   "label": "Refined (Gaussian Splatting)",
+   "file": "refined.splat",
+   "count": 800000
+  },
+  {
+   "id": "live",
+   "label": "Live map (on-device replay)",
+   "file": "live.splat",
+   "count": 8093
+  },
+  {
+   "id": "sparse",
+   "label": "Sparse map (SfM points)",
+   "file": "sparse.splat",
+   "count": 24981
+  },
+  {
+   "id": "confidence",
+   "label": "Confidence (red = weakly observed)",
+   "file": "confidence.splat",
+   "count": 24981
+  }
+ ],
+ "start": {
+  "position": [
+   -0.8539,
+   0.0705,
+   6.2124
+  ],
+  "direction": [
+   0.9415,
+   -0.0528,
+   -0.333
+  ]
+ },
+ "metrics": {
+  "audio": {
+   "has_audio": true,
+   "events": 0
+  },
+  "confidence": {
+   "points": 24981,
+   "low_confidence_pct": 14.8,
+   "median_triangulation_angle_deg": 6.72,
+   "median_confidence": 0.599
+  },
+  "evaluate": {
+   "note": "no ground truth for this sequence"
+  },
+  "ingest": {
+   "source_video": {
+    "width": 1280,
+    "height": 720,
+    "fps": 30.0,
+    "duration_s": 468.647,
+    "codec": "vp8",
+    "has_audio": true
+   },
+   "kind": "video",
+   "frames": 440,
+   "width": 1280,
+   "height": 720,
+   "duration_s": 109.75,
+   "fps": 4,
+   "has_audio": true,
+   "has_groundtruth": false
+  },
+  "live": {
+   "frames_processed": 440,
+   "keyframes": 168,
+   "live_map_points": 26999,
+   "latency_ms_p50": 9.4,
+   "latency_ms_p95": 15.3,
+   "latency_ms_max": 24.2,
+   "budget_ms_at_ingest_fps": 250.0,
+   "pct_within_ingest_budget": 100.0,
+   "budget_ms_at_30fps": 33.3,
+   "pct_within_30fps_budget": 100.0,
+   "frames_not_tracked": 88,
+   "map_resets": 10,
+   "intrinsics_source": "SfM self-calibration (stand-in for factory calibration)"
+  },
+  "preview": {
+   "sparse_splats": 24981,
+   "live_splats": 26999
+  },
+  "privacy": {
+   "enabled": true,
+   "images": 283,
+   "faces_blurred": 8,
+   "images_with_faces": 8
+  },
+  "select": {
+   "frames_in": 440,
+   "keyframes": 283,
+   "rejected": 27,
+   "skipped": 130,
+   "drop_reasons": {
+    "redundant": 121,
+    "blur": 9,
+    "fast_motion": 18,
+    "low_parallax": 9
+   }
+  },
+  "sfm": {
+   "images_input": 283,
+   "images_registered": 95,
+   "registered_pct": 33.6,
+   "points3d": 24981,
+   "mean_reprojection_error_px": 1.05,
+   "mean_track_length": 4.67,
+   "mean_observations_per_image": 1227.4,
+   "camera": {
+    "1": {
+     "model": "SIMPLE_RADIAL",
+     "params": [
+      900.1884,
+      640.0,
+      360.0,
+      -0.0262
+     ]
+    }
+   }
+  },
+  "splat": {
+   "iterations": 7000,
+   "train_time_s": 131.2,
+   "gaussians": 1220159,
+   "train_views": 83,
+   "test_views": 12,
+   "test_psnr_db": 22.28,
+   "test_ssim": 0.7295,
+   "gpu": "NVIDIA GeForce RTX 5070",
+   "peak_gpu_mem_gb": 2.17,
+   "downscale": 2
+  }
+ },
+ "generated_utc": "2026-11-07T01:16:15+00:00"
+}

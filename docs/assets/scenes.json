@@ -1,6 +1,14 @@
 {
  "scenes": [
   {
+   "name": "dc-glass",
+   "source": "Google Glass (consumer video export)"
+  },
+  {
+   "name": "london-walk",
+   "source": "Generic video (unknown calibration)"
+  },
+  {
    "name": "tum-desk",
    "source": "TUM RGB-D fr1 (handheld, motion-capture ground truth)"
   }
