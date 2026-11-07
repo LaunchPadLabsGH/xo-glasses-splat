@@ -100,54 +100,6 @@ xgs train --run runs/tum-desk --device tum_fr1
 xgs export --run runs/tum-desk --name tum-desk --device tum_fr1
 ```
 
-### Windows: running from another drive
-
-WSL keeps its Ubuntu install, and everything in it, on C: by default. This project needs about 15 GB
-(CUDA toolkit, PyTorch, footage and results). To keep it all on another drive (it must be an internal
-NTFS drive, and the target folder must not be compressed), move Ubuntu there before running setup.
-In PowerShell:
-
-```powershell
-wsl --update
-wsl --list --verbose          # note your distribution's name, e.g. Ubuntu
-wsl --shutdown
-wsl --manage Ubuntu --move F:\WSL\Ubuntu
-```
-
-On older WSL versions without `--manage --move`, export and re-import instead. Check that the `.tar`
-file exists and is several GB before running `--unregister`: that step deletes the C: copy.
-
-```powershell
-mkdir F:\WSL
-wsl --export Ubuntu F:\WSL\ubuntu.tar
-wsl --unregister Ubuntu
-wsl --import Ubuntu F:\WSL\Ubuntu F:\WSL\ubuntu.tar
-wsl -d Ubuntu -u root -- bash -c "printf '[user]\ndefault=YOUR_LINUX_USERNAME\n' >> /etc/wsl.conf"
-wsl --shutdown
-```
-
-**If the move seems to hang:** it is usually still copying. The `.vhdx` file appears on F: straight
-away and fills up as the copy runs. The C: original is deleted only once the copy succeeds, so nothing
-is lost while you wait. In a second PowerShell window:
-
-```powershell
-(Get-Item F:\WSL\Ubuntu\ext4.vhdx).Length / 1GB      # run a few times: still growing = still copying
-Get-ChildItem HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss | Get-ItemProperty | Select DistributionName, BasePath
-```
-
-The second command shows where WSL currently keeps the distribution; the copy is done when F: reaches
-the size of the `ext4.vhdx` in that folder. Close Docker Desktop, VS Code WSL windows and Ubuntu
-terminals, which hold the disk open. Add `F:\WSL` as a Windows Security exclusion if antivirus slows
-the copy. Press Ctrl+C only if the F: size has not changed for 15 minutes and F: is idle. Then, if
-`BasePath` still points to C:, delete the partial F: copy and use export/import instead. Never delete
-either `.vhdx` until `wsl -d Ubuntu` starts and your files are there.
-
-Without Ubuntu installed yet, install it straight onto F: with
-`wsl --install -d Ubuntu-24.04 --location F:\WSL\Ubuntu`.
-
-Keep the repository inside Ubuntu (e.g. `~/xo-glasses-splat`), not under `/mnt/f`. Windows-drive
-access from WSL is many times slower, and the Ubuntu install itself is now on F:.
-
 All demo scenes end to end: `bash scripts/run_demo.sh`. To view locally:
 `(cd docs && python3 -m http.server 8000)`, then open http://localhost:8000.
 
@@ -156,6 +108,6 @@ versions. Re-runs skip unchanged stages, which keeps results reproducible.
 
 ## Licence
 
-Copyright © 2026 X-O Labs Ltd. All rights reserved. Shared for evaluation; see [LICENSE](LICENSE).
+Shared for evaluation; see [LICENSE](LICENSE).
 Third-party components are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and demo data
 attribution in [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
