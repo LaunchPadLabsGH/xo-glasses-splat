@@ -1,0 +1,8 @@
+{
+ "scenes": [
+  {
+   "name": "tum-desk",
+   "source": "TUM RGB-D fr1 (handheld, motion-capture ground truth)"
+  }
+ ]
+}

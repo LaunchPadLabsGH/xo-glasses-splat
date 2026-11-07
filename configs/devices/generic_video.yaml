@@ -1,0 +1,6 @@
+# Any video with unknown calibration: intrinsics are self-calibrated by SfM.
+name: Generic video (unknown calibration)
+kind: video
+calibration: null
+rolling_shutter_readout_ms: null
+imu: null

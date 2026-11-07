@@ -1,0 +1,152 @@
+{
+ "name": "tum-desk",
+ "source": "TUM RGB-D fr1 (handheld, motion-capture ground truth)",
+ "units": "metres (scaled by alignment to ground truth)",
+ "extent": 1.613,
+ "layers": [
+  {
+   "id": "live",
+   "label": "Live map (on-device replay)",
+   "file": "live.splat",
+   "count": 16886
+  },
+  {
+   "id": "sparse",
+   "label": "Sparse map (SfM points)",
+   "file": "sparse.splat",
+   "count": 22827
+  },
+  {
+   "id": "confidence",
+   "label": "Confidence (red = weakly observed)",
+   "file": "confidence.splat",
+   "count": 22827
+  }
+ ],
+ "start": {
+  "position": [
+   0.8881,
+   0.1793,
+   -0.3374
+  ],
+  "direction": [
+   -0.338,
+   -0.1456,
+   -0.9298
+  ]
+ },
+ "metrics": {
+  "audio": {
+   "has_audio": false,
+   "events": 0
+  },
+  "confidence": {
+   "points": 22827,
+   "low_confidence_pct": 13.1,
+   "median_triangulation_angle_deg": 8.1,
+   "median_confidence": 0.65
+  },
+  "evaluate": {
+   "sfm_ate": {
+    "matched": 219,
+    "ate_rmse_m": 0.0351,
+    "ate_median_m": 0.0223,
+    "ate_max_m": 0.1244,
+    "gt_path_length_m": 9.377,
+    "ate_pct_of_path": 0.37,
+    "sim3_scale": 0.2275
+   },
+   "live_ate": {
+    "matched": 140,
+    "ate_rmse_m": 0.5731,
+    "ate_median_m": 0.4575,
+    "ate_max_m": 1.0733,
+    "gt_path_length_m": 9.326,
+    "ate_pct_of_path": 6.15,
+    "sim3_scale": 0.0485
+   },
+   "live_ate_longest_segment": {
+    "matched": 49,
+    "ate_rmse_m": 0.114,
+    "ate_median_m": 0.0872,
+    "ate_max_m": 0.2254,
+    "gt_path_length_m": 2.812,
+    "ate_pct_of_path": 4.05,
+    "sim3_scale": 0.0419,
+    "poses": 49,
+    "segments": 3
+   }
+  },
+  "ingest": {
+   "kind": "tum",
+   "frames": 407,
+   "width": 640,
+   "height": 480,
+   "duration_s": 20.38,
+   "fps": 30,
+   "has_audio": false,
+   "has_groundtruth": true
+  },
+  "live": {
+   "frames_processed": 407,
+   "keyframes": 140,
+   "live_map_points": 42298,
+   "latency_ms_p50": 11.1,
+   "latency_ms_p95": 29.0,
+   "latency_ms_max": 190.8,
+   "budget_ms_at_ingest_fps": 33.3,
+   "pct_within_ingest_budget": 97.1,
+   "budget_ms_at_30fps": 33.3,
+   "pct_within_30fps_budget": 97.1,
+   "frames_not_tracked": 33,
+   "map_resets": 2,
+   "intrinsics_source": "device calibration"
+  },
+  "preview": {
+   "sparse_splats": 22827,
+   "live_splats": 42298
+  },
+  "privacy": {
+   "enabled": true,
+   "images": 220,
+   "faces_blurred": 24,
+   "images_with_faces": 24
+  },
+  "select": {
+   "frames_in": 407,
+   "keyframes": 220,
+   "rejected": 24,
+   "skipped": 163,
+   "drop_reasons": {
+    "redundant": 141,
+    "low_parallax": 22,
+    "blur": 24
+   }
+  },
+  "sfm": {
+   "images_input": 220,
+   "images_registered": 219,
+   "registered_pct": 99.5,
+   "points3d": 22827,
+   "mean_reprojection_error_px": 0.921,
+   "mean_track_length": 6.26,
+   "mean_observations_per_image": 652.3,
+   "camera": {
+    "1": {
+     "model": "OPENCV",
+     "params": [
+      517.3,
+      516.5,
+      318.6,
+      255.3,
+      0.2624,
+      -0.9531,
+      -0.0054,
+      0.0026
+     ]
+    }
+   }
+  }
+ },
+ "generated_utc": "2026-11-07T00:26:02+00:00"
+}

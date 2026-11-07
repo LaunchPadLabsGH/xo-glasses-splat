@@ -1,0 +1,63 @@
+# Default pipeline parameters. Device profiles (configs/devices/*.yaml) and
+# `--set key.sub=value` CLI overrides are merged on top of this file.
+
+device: generic_video
+
+ingest:
+  fps: 6              # frames per second to extract from video (keyframe selection thins these further)
+  max_width: 1600     # downscale wide footage; splat training can downscale again
+  start_s: 0.0        # trim: start offset in seconds
+  duration_s: null    # trim: length in seconds (null = to the end)
+  extract_audio: true
+
+select:
+  blur_window: 15             # frames either side used for the rolling sharpness median
+  blur_rel_threshold: 0.55    # reject if sharpness < this fraction of the local median
+  blur_abs_min: 15.0          # reject if variance-of-Laplacian below this, whatever the neighbours
+  max_gyro_deg_s: 150.0       # reject frames captured during fast head turns (needs IMU)
+  max_flow_frac: 0.12         # reject if inter-frame median flow > this fraction of image width (no IMU)
+  min_parallax_frac: 0.025    # new keyframe once median feature displacement since last keyframe exceeds this
+  lookback: 4                 # when a keyframe is due, take the sharpest of the last N acceptable frames
+  max_keyframes: 300          # budget: uniform subsample if exceeded
+
+privacy:
+  enabled: true
+  score_threshold: 0.6
+  margin: 0.25                # grow each face box by this fraction before blurring
+  # YuNet (MIT), mirrored by OpenCV on Hugging Face and in opencv_zoo on GitHub
+  model_url: https://huggingface.co/opencv/face_detection_yunet/resolve/main/face_detection_yunet_2023mar.onnx
+  model_sha256: 8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4
+
+sfm:
+  mapper: incremental         # incremental (robust) | global (faster, GLOMAP)
+  max_image_size: 1600
+  max_num_features: 8192
+  sequential_overlap: 12
+  camera_model: SIMPLE_RADIAL # used when the device profile gives no calibration
+  min_track_len: 2
+
+confidence:
+  full_obs: 6                 # observations at which a point is considered fully supported
+  full_angle_deg: 10.0        # triangulation angle at which a point is considered well constrained
+  low_threshold: 0.35
+
+live:
+  enabled: true
+  orb_features: 1500
+  ratio: 0.75
+  min_parallax_frac: 0.03
+  min_inliers: 60
+  max_points: 200000
+
+splat:
+  iterations: 7000
+  sh_degree: 3
+  downscale: 2                # train on 1/N resolution images
+  test_every: 8               # every Nth image held out for evaluation
+  seed: 42
+  random_background: false
+  prune_opacity: 0.02         # export: drop Gaussians below this opacity
+  web_max_splats: 800000      # export: cap for the browser viewer
+
+export:
+  web_dir: docs/assets

@@ -1,0 +1,15 @@
+# TUM RGB-D benchmark, Freiburg 1 sensor (handheld Kinect RGB camera).
+# Calibration from https://cvg.cit.tum.de/data/datasets/rgbd-dataset/file_formats
+# Licence: CC BY 4.0.
+name: TUM RGB-D fr1 (handheld, motion-capture ground truth)
+kind: tum
+calibration:
+  # Published model: k1=0.2624 k2=-0.9531 p1=-0.0054 p2=0.0026 k3=1.1633. COLMAP's
+  # iterative undistortion diverges with that large k3, so the OPENCV model
+  # (k1, k2, p1, p2) is used; the k3 term only matters at the image corners.
+  model: OPENCV                # fx, fy, cx, cy, k1, k2, p1, p2
+  width: 640
+  height: 480
+  params: [517.3, 516.5, 318.6, 255.3, 0.2624, -0.9531, -0.0054, 0.0026]
+rolling_shutter_readout_ms: null
+imu: null
