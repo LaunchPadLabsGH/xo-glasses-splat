@@ -1,0 +1,14 @@
+# XREAL Aura (Android XR): proposed primary device in the HMGCC proposal.
+# EVERY value below is a placeholder to be verified at the Week 1 device gate:
+# third-party access to the RGB camera and IMU on Android XR is not yet confirmed.
+name: XREAL Aura (placeholder, verify at Week 1 gate)
+kind: video
+calibration: null              # to be filled from the SDK's camera intrinsics, if exposed
+rolling_shutter_readout_ms: null
+imu:
+  format: generic_csv          # expected export: t_s, gx, gy, gz (rad/s), ax, ay, az (m/s^2)
+  gyro_units: rad_s
+notes: >
+  Compute puck (Snapdragon, 48 TOPS, 265 g) is the body-worn edge processor for the live path.
+  Verify: camera API access, IMU timestamps on the same clock as video, offline operation,
+  developer and platform terms (no clause barring defence/security use).

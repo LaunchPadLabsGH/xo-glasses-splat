@@ -1,0 +1,9 @@
+# Google Glass (Explorer Edition) footage, e.g. the Wikimedia Commons demo clip.
+# 720p, consumer video export only: no IMU, unknown calibration, and the public
+# clip was post-stabilised by YouTube, which warps geometry (a real-world
+# example of why raw, unstabilised capture matters for mapping).
+name: Google Glass (consumer video export)
+kind: video
+calibration: null
+rolling_shutter_readout_ms: null
+imu: null

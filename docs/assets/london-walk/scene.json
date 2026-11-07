@@ -1,0 +1,146 @@
+{
+ "name": "london-walk",
+ "source": "Generic video (unknown calibration)",
+ "units": "arbitrary (monocular reconstruction has no absolute scale)",
+ "extent": 176.685,
+ "layers": [
+  {
+   "id": "refined",
+   "label": "Refined (Gaussian Splatting)",
+   "file": "refined.splat",
+   "count": 798652
+  },
+  {
+   "id": "live",
+   "label": "Live map (on-device replay)",
+   "file": "live.splat",
+   "count": 271
+  },
+  {
+   "id": "sparse",
+   "label": "Sparse map (SfM points)",
+   "file": "sparse.splat",
+   "count": 2666
+  },
+  {
+   "id": "confidence",
+   "label": "Confidence (red = weakly observed)",
+   "file": "confidence.splat",
+   "count": 2666
+  }
+ ],
+ "start": {
+  "position": [
+   13.582,
+   0.2584,
+   3.5168
+  ],
+  "direction": [
+   0.1971,
+   -0.1207,
+   -0.9729
+  ]
+ },
+ "metrics": {
+  "audio": {
+   "has_audio": true,
+   "events": 1
+  },
+  "confidence": {
+   "points": 2666,
+   "low_confidence_pct": 11.8,
+   "median_triangulation_angle_deg": 2.57,
+   "median_confidence": 0.471
+  },
+  "evaluate": {
+   "note": "no ground truth for this sequence"
+  },
+  "ingest": {
+   "source_video": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 29.97002997002997,
+    "duration_s": 92.408,
+    "codec": "vp9",
+    "has_audio": true
+   },
+   "kind": "video",
+   "frames": 277,
+   "width": 1920,
+   "height": 1080,
+   "duration_s": 92.0,
+   "fps": 3,
+   "has_audio": true,
+   "has_groundtruth": false
+  },
+  "live": {
+   "frames_processed": 277,
+   "keyframes": 30,
+   "live_map_points": 1671,
+   "latency_ms_p50": 13.1,
+   "latency_ms_p95": 17.9,
+   "latency_ms_max": 29.8,
+   "budget_ms_at_ingest_fps": 333.3,
+   "pct_within_ingest_budget": 100.0,
+   "budget_ms_at_30fps": 33.3,
+   "pct_within_30fps_budget": 100.0,
+   "frames_not_tracked": 177,
+   "map_resets": 18,
+   "intrinsics_source": "SfM self-calibration (stand-in for factory calibration)"
+  },
+  "preview": {
+   "sparse_splats": 2666,
+   "live_splats": 1671
+  },
+  "privacy": {
+   "enabled": true,
+   "images": 155,
+   "faces_blurred": 73,
+   "images_with_faces": 41
+  },
+  "select": {
+   "frames_in": 277,
+   "keyframes": 155,
+   "rejected": 9,
+   "skipped": 113,
+   "drop_reasons": {
+    "low_parallax": 50,
+    "redundant": 63,
+    "blur": 9
+   }
+  },
+  "sfm": {
+   "images_input": 155,
+   "images_registered": 104,
+   "registered_pct": 67.1,
+   "points3d": 2666,
+   "mean_reprojection_error_px": 1.173,
+   "mean_track_length": 18.64,
+   "mean_observations_per_image": 477.9,
+   "camera": {
+    "1": {
+     "model": "SIMPLE_RADIAL",
+     "params": [
+      1114.0961,
+      960.0,
+      540.0,
+      0.0105
+     ]
+    }
+   }
+  },
+  "splat": {
+   "iterations": 7000,
+   "train_time_s": 130.2,
+   "gaussians": 986386,
+   "train_views": 91,
+   "test_views": 13,
+   "test_psnr_db": 21.62,
+   "test_ssim": 0.6346,
+   "gpu": "NVIDIA GeForce RTX 5070",
+   "peak_gpu_mem_gb": 2.12,
+   "downscale": 2
+  }
+ },
+ "generated_utc": "2026-11-07T01:22:00+00:00"
+}

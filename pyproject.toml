@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xgs"
+version = "0.1.0"
+description = "Smart-glasses footage to live 3D maps and Gaussian Splatting models, on worn and local hardware only."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary - see LICENSE" }
+authors = [{ name = "X-O Labs Ltd" }]
+dependencies = [
+  "numpy>=1.26",
+  "opencv-python-headless>=4.10,<5",
+  "pycolmap>=4.2,<5",
+  "pyyaml>=6",
+  "typer>=0.12",
+  "rich>=13",
+  "plyfile>=1.0",
+  "scipy>=1.11",
+  "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+# Install torch separately from the CUDA 12.8 index first (see scripts/setup_wsl_gpu.sh).
+gpu = ["gsplat==1.5.3", "ninja", "jaxtyping"]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+xgs = "xgs.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+xgs = ["py.typed"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["B008"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["gpu: requires a CUDA GPU and gsplat", "slow: end-to-end tests on real footage"]

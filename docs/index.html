@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Glasses Splat Viewer</title>
+<meta name="description" content="X-O Labs proof of concept: smart-glasses footage to live 3D maps and Gaussian Splatting models, processed on worn and local hardware only.">
+<style>
+  :root {
+    --bg: #0e1116;
+    --panel: rgba(250, 250, 252, 0.94);
+    --panel-solid: #fafafc;
+    --text: #15181d;
+    --muted: #5b6370;
+    --line: #d9dde3;
+    --accent: #1f6feb;
+    --accent-text: #ffffff;
+    --good: #1f8a4c;
+    --warn: #b7791f;
+    --bad: #c53030;
+    --chip: #eef1f5;
+    --shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --panel: rgba(22, 26, 32, 0.94);
+      --panel-solid: #161a20;
+      --text: #e8ebf0;
+      --muted: #9aa3b0;
+      --line: #2c323b;
+      --accent: #4c8dff;
+      --chip: #222831;
+    }
+  }
+  :root[data-theme="dark"] {
+    --panel: rgba(22, 26, 32, 0.94);
+    --panel-solid: #161a20;
+    --text: #e8ebf0;
+    --muted: #9aa3b0;
+    --line: #2c323b;
+    --accent: #4c8dff;
+    --chip: #222831;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+  #canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  .panel { position: fixed; top: 16px; left: 16px; width: 340px; max-height: calc(100% - 32px); overflow: auto;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
+    backdrop-filter: blur(8px); }
+  .panel header { padding: 14px 16px 10px; border-bottom: 1px solid var(--line); display: flex; gap: 8px;
+    align-items: flex-start; justify-content: space-between; }
+  h1 { font-size: 16px; margin: 0; letter-spacing: 0.1px; }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .section { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .section:last-child { border-bottom: 0; }
+  .section h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted);
+    margin: 0 0 8px; font-weight: 600; }
+  select, button { font: inherit; color: var(--text); }
+  select { width: 100%; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--panel-solid); }
+  .layers label, .toggles label { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+  .layers .count { margin-left: auto; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  button.btn { padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--chip);
+    cursor: pointer; }
+  button.btn.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  button.btn:disabled { opacity: 0.5; cursor: default; }
+  button.icon { border: 0; background: transparent; cursor: pointer; padding: 2px 6px; font-size: 18px;
+    color: var(--muted); line-height: 1; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  td { padding: 3px 0; vertical-align: top; }
+  td:last-child { text-align: right; font-weight: 600; padding-left: 10px; }
+  td:first-child { color: var(--muted); }
+  .note { color: var(--muted); font-size: 12px; }
+  .legend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .legend .bar { flex: 1; height: 8px; border-radius: 4px;
+    background: linear-gradient(90deg, #dc322f, #ebaa28, #28aa5a); }
+  .status { position: fixed; right: 16px; bottom: 16px; background: var(--panel); color: var(--text);
+    border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 12px; box-shadow: var(--shadow); }
+  .status:empty { display: none; }
+  .collapsed .body { display: none; }
+  a { color: var(--accent); }
+  @media (max-width: 640px) {
+    .panel { left: 16px; right: 16px; width: auto; top: auto; bottom: 16px; max-height: 55%; }
+    .status { top: 16px; bottom: auto; right: 16px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="canvas" aria-label="3D map viewer"></canvas>
+
+<aside class="panel" id="panel">
+  <header>
+    <div>
+      <h1>Smart glasses to 3D map</h1>
+      <div class="sub">X-O Labs proof of concept · worn + local hardware only</div>
+    </div>
+    <button class="icon" id="collapse" aria-label="Collapse panel" title="Collapse">−</button>
+  </header>
+  <div class="body">
+    <div class="section">
+      <h2>Scene</h2>
+      <select id="scene" aria-label="Scene"></select>
+      <div class="note" id="source" style="margin-top:6px"></div>
+    </div>
+    <div class="section">
+      <h2>Map layer</h2>
+      <div class="layers" id="layers"></div>
+      <div class="legend" id="legend" hidden><span>weak</span><span class="bar"></span><span>strong</span></div>
+    </div>
+    <div class="section toggles">
+      <h2>Overlays</h2>
+      <label><input type="checkbox" id="showPath" checked> Camera path (post-mission poses)</label>
+      <label><input type="checkbox" id="showLive"> Live path (on-device replay)</label>
+      <label id="eventsRow"><input type="checkbox" id="showEvents" checked> Audio events</label>
+    </div>
+    <div class="section">
+      <div class="btns">
+        <button class="btn primary" id="walk">Walk the route</button>
+        <button class="btn" id="overview">Overview</button>
+      </div>
+      <div class="note" style="margin-top:8px">Drag to orbit · scroll or pinch to zoom · right-drag to pan</div>
+    </div>
+    <div class="section">
+      <h2>Measured results</h2>
+      <table id="metrics"></table>
+      <div class="note" id="units" style="margin-top:8px"></div>
+    </div>
+    <div class="section note">
+      Proof of concept with honest limits: live tracking is a CPU stand-in for on-glasses
+      visual-inertial odometry; monocular footage has no absolute scale unless calibrated.
+      Faces are blurred before reconstruction.
+      <a href="https://github.com/LaunchPadLabsGH/xo-glasses-splat">Code and method</a>
+    </div>
+  </div>
+</aside>
+<div class="status" id="status" role="status" aria-live="polite"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+    "@sparkjsdev/spark": "https://cdn.jsdelivr.net/npm/@sparkjsdev/spark@2.3.1/dist/spark.module.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { SparkRenderer, SplatMesh } from "@sparkjsdev/spark";
+
+const $ = (id) => document.getElementById(id);
+const status = (msg) => { $("status").textContent = msg || ""; };
+
+const canvas = $("canvas");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0e1116);
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.005, 2000);
+const spark = new SparkRenderer({ renderer });
+scene.add(spark);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+
+const overlays = new THREE.Group();
+scene.add(overlays);
+let current = { meta: null, mesh: null, traj: null, base: "", layerId: null };
+let walk = null;
+
+function fmt(v, unit = "", digits = 2) {
+  if (v === null || v === undefined || Number.isNaN(v)) return "–";
+  const n = typeof v === "number" ? v.toLocaleString(undefined, { maximumFractionDigits: digits }) : v;
+  return unit ? `${n} ${unit}` : `${n}`;
+}
+
+function metricRows(m) {
+  const rows = [];
+  const sel = m.select || {}, sfm = m.sfm || {}, live = m.live || {}, ev = m.evaluate || {};
+  const pri = m.privacy || {}, splat = m.splat || {}, conf = m.confidence || {};
+  if (sel.frames_in) rows.push(["Keyframes kept", `${sel.keyframes} of ${sel.frames_in}`]);
+  if (pri.images !== undefined) rows.push(["Face detections blurred", fmt(pri.faces_blurred, "", 0)]);
+  if (sfm.images_registered !== undefined) rows.push(["Images posed (SfM)", `${sfm.images_registered} (${sfm.registered_pct}%)`]);
+  if (sfm.mean_reprojection_error_px !== undefined) rows.push(["Reprojection error", fmt(sfm.mean_reprojection_error_px, "px")]);
+  if (ev.sfm_ate && ev.sfm_ate.ate_rmse_m !== undefined)
+    rows.push(["Pose error vs ground truth", `${fmt(ev.sfm_ate.ate_rmse_m * 100, "cm", 1)} (${ev.sfm_ate.ate_pct_of_path}% of path)`]);
+  if (live.latency_ms_p50 !== undefined) rows.push(["Live latency p50 / p95", `${live.latency_ms_p50} / ${live.latency_ms_p95} ms`]);
+  if (live.pct_within_30fps_budget !== undefined) rows.push(["Frames within 30 fps budget", fmt(live.pct_within_30fps_budget, "%", 1)]);
+  const seg = ev.live_ate_longest_segment;
+  if (seg && seg.ate_rmse_m !== undefined) rows.push(["Live drift (longest segment)", `${fmt(seg.ate_rmse_m * 100, "cm", 1)} over ${seg.gt_path_length_m} m`]);
+  if (conf.low_confidence_pct !== undefined) rows.push(["Low-confidence points", fmt(conf.low_confidence_pct, "%", 1)]);
+  if (splat.test_psnr_db !== undefined) rows.push(["Splat PSNR (held-out views)", fmt(splat.test_psnr_db, "dB")]);
+  if (splat.train_time_s !== undefined) rows.push(["Splat training time", `${fmt(splat.train_time_s / 60, "min", 1)} (${splat.gpu})`]);
+  return rows;
+}
+
+function clearOverlays() {
+  for (const c of [...overlays.children]) { overlays.remove(c); c.geometry?.dispose(); c.material?.dispose(); }
+}
+
+function drawPath(points, color, name) {
+  if (!points || points.length < 2) return;
+  const g = new THREE.BufferGeometry().setFromPoints(points.map((p) => new THREE.Vector3(...p.p)));
+  const line = new THREE.Line(g, new THREE.LineBasicMaterial({ color, depthTest: false, transparent: true, opacity: 0.9 }));
+  line.name = name;
+  line.renderOrder = 10;
+  overlays.add(line);
+}
+
+function drawEvents(events, size) {
+  const group = new THREE.Group();
+  group.name = "events";
+  const geo = new THREE.SphereGeometry(size, 16, 12);
+  for (const e of events) {
+    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xff7a1a, depthTest: false }));
+    m.position.set(...e.position);
+    m.renderOrder = 11;
+    group.add(m);
+  }
+  overlays.add(group);
+}
+
+function updateOverlayVisibility() {
+  for (const c of overlays.children) {
+    if (c.name === "sfmPath") c.visible = $("showPath").checked;
+    if (c.name === "livePath") c.visible = $("showLive").checked;
+    if (c.name === "events") c.visible = $("showEvents").checked;
+  }
+}
+
+let loadToken = 0;
+const meshCache = new Map();  // layer id -> SplatMesh, so switching layers is instant after first load
+
+async function getMesh(layer) {
+  const key = `${current.base}/${layer.file}`;
+  if (!meshCache.has(key)) {
+    const mesh = new SplatMesh({ url: key });
+    mesh.visible = false;
+    scene.add(mesh);
+    meshCache.set(key, mesh);
+  }
+  const mesh = meshCache.get(key);
+  await mesh.initialized;
+  return mesh;
+}
+
+async function showLayer(id) {
+  const layer = current.meta.layers.find((l) => l.id === id);
+  if (!layer) return;
+  const token = ++loadToken;
+  current.layerId = id;
+  $("legend").hidden = id !== "confidence";
+  status(`Loading ${layer.label}…`);
+  const mesh = await getMesh(layer);
+  if (token !== loadToken) return;  // a newer selection superseded this one
+  for (const m of meshCache.values()) m.visible = m === mesh;
+  current.mesh = mesh;
+  spark.setDirty();
+  status("");
+}
+
+function clearMeshes() {
+  for (const m of meshCache.values()) { scene.remove(m); m.dispose?.(); }
+  meshCache.clear();
+  current.mesh = null;
+}
+
+function overview() {
+  const e = current.meta.extent || 5;
+  const p = new THREE.Vector3(...current.meta.start.position);
+  controls.target.set(0, 0, 0);
+  camera.position.set(e * 0.9, e * 1.1, e * 1.4).add(new THREE.Vector3(0, 0, 0));
+  camera.lookAt(controls.target);
+  controls.update();
+  return p;
+}
+
+function startWalk() {
+  const path = current.traj?.sfm;
+  if (!path || path.length < 2) return;
+  if (walk) { walk = null; $("walk").textContent = "Walk the route"; controls.enabled = true; return; }
+  walk = { i: 0, t0: performance.now(), path };
+  controls.enabled = false;
+  $("walk").textContent = "Stop";
+}
+
+function stepWalk(now) {
+  if (!walk) return;
+  const { path } = walk;
+  const duration = Math.max(8000, path.length * 120);
+  const u = ((now - walk.t0) % duration) / duration * (path.length - 1);
+  const i = Math.floor(u), f = u - i;
+  const a = path[i], b = path[Math.min(i + 1, path.length - 1)];
+  const pos = new THREE.Vector3(...a.p).lerp(new THREE.Vector3(...b.p), f);
+  const dir = new THREE.Vector3(...a.d).lerp(new THREE.Vector3(...b.d), f).normalize();
+  camera.position.copy(pos);
+  camera.lookAt(pos.clone().add(dir));
+  controls.target.copy(pos.clone().add(dir.multiplyScalar(0.5)));
+}
+
+async function loadScene(name) {
+  walk = null; $("walk").textContent = "Walk the route"; controls.enabled = true;
+  clearMeshes();
+  current.base = `assets/${name}`;
+  status("Loading scene…");
+  const [meta, traj, events] = await Promise.all([
+    fetch(`${current.base}/scene.json`).then((r) => r.json()),
+    fetch(`${current.base}/trajectory.json`).then((r) => r.json()),
+    fetch(`${current.base}/events.json`).then((r) => r.json()).catch(() => []),
+  ]);
+  current.meta = meta;
+  current.traj = traj;
+  $("source").textContent = meta.source || "";
+  $("units").textContent = `Units: ${meta.units}.`;
+  const layersEl = $("layers");
+  layersEl.innerHTML = "";
+  for (const l of meta.layers) {
+    const row = document.createElement("label");
+    row.innerHTML = `<input type="radio" name="layer" value="${l.id}"> <span>${l.label}</span>
+      <span class="count">${l.count.toLocaleString()}</span>`;
+    row.querySelector("input").addEventListener("change", () => showLayer(l.id));
+    layersEl.appendChild(row);
+  }
+  const first = (meta.layers.find((l) => l.id === "refined") || meta.layers.find((l) => l.id === "sparse") || meta.layers[0]).id;
+  layersEl.querySelector(`input[value="${first}"]`).checked = true;
+  $("metrics").innerHTML = metricRows(meta.metrics).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+  clearOverlays();
+  drawPath(traj.sfm, 0x37d0ff, "sfmPath");
+  drawPath(traj.live, 0xff4fd8, "livePath");
+  drawEvents(events, (meta.extent || 5) * 0.015);
+  $("eventsRow").hidden = !events.length;
+  $("showLive").parentElement.hidden = !(traj.live && traj.live.length > 1);
+  updateOverlayVisibility();
+  overview();
+  await showLayer(first);
+}
+
+async function init() {
+  const params = new URLSearchParams(location.search);
+  const idx = await fetch("assets/scenes.json").then((r) => r.json());
+  const sel = $("scene");
+  for (const s of idx.scenes) {
+    const o = document.createElement("option");
+    o.value = s.name; o.textContent = s.name + (s.source ? ` — ${s.source}` : "");
+    sel.appendChild(o);
+  }
+  const want = params.get("scene");
+  if (want && idx.scenes.some((s) => s.name === want)) sel.value = want;
+  sel.addEventListener("change", () => loadScene(sel.value));
+  await loadScene(sel.value);
+}
+
+for (const id of ["showPath", "showLive", "showEvents"]) $(id).addEventListener("change", updateOverlayVisibility);
+$("walk").addEventListener("click", startWalk);
+$("overview").addEventListener("click", () => { walk = null; $("walk").textContent = "Walk the route"; controls.enabled = true; overview(); });
+$("collapse").addEventListener("click", () => {
+  const p = $("panel"); p.classList.toggle("collapsed");
+  $("collapse").textContent = p.classList.contains("collapsed") ? "+" : "−";
+});
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+renderer.setAnimationLoop((now) => {
+  stepWalk(now);
+  if (!walk) controls.update();
+  renderer.render(scene, camera);
+});
+init().catch((err) => { console.error(err); status(`Could not load scene: ${err.message}`); });
+</script>
+</body>
+</html>
