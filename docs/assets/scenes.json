@@ -2,15 +2,18 @@
  "scenes": [
   {
    "name": "dc-glass",
-   "source": "Google Glass (consumer video export)"
+   "source": "Google Glass (consumer video export)",
+   "title": "Washington DC waterfront, real Google Glass footage"
   },
   {
    "name": "london-walk",
-   "source": "Generic video (unknown calibration)"
+   "source": "Handheld video (calibration estimated from footage)",
+   "title": "Canada Water, London, 4K walking video"
   },
   {
    "name": "tum-desk",
-   "source": "TUM RGB-D fr1 (handheld, motion-capture ground truth)"
+   "source": "TUM RGB-D fr1 (handheld, motion-capture ground truth)",
+   "title": "Desk benchmark, handheld camera with motion-capture ground truth"
   }
  ]
 }

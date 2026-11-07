@@ -1,6 +1,6 @@
 {
  "name": "london-walk",
- "source": "Generic video (unknown calibration)",
+ "source": "Handheld video (calibration estimated from footage)",
  "units": "arbitrary (monocular reconstruction has no absolute scale)",
  "extent": 176.685,
  "layers": [
@@ -142,5 +142,14 @@
    "downscale": 2
   }
  },
- "generated_utc": "2026-11-07T01:22:00+00:00"
+ "generated_utc": "2026-11-07T01:22:00+00:00",
+ "info": {
+  "title": "Canada Water, London, 4K walking video",
+  "order": 2,
+  "attribution": "\"Canada Water and Rafter Walk in Southwark, London Docklands\" by Acabashi",
+  "source_url": "https://commons.wikimedia.org/wiki/File:Canada_Water_and_Rafter_Walk_in_Southwark,_London_Docklands.webm",
+  "licence": "CC BY-SA 4.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "note": "Faces blurred and reduced to a 3D reconstruction. This derived 3D scene is shared under CC BY-SA 4.0."
+ }
 }

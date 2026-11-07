@@ -74,6 +74,8 @@
   td:last-child { text-align: right; font-weight: 600; padding-left: 10px; }
   td:first-child { color: var(--muted); }
   .note { color: var(--muted); font-size: 12px; }
+  .credit { margin-top: 4px; }
+  .credit:empty { display: none; }
   .legend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 6px; }
   .legend .bar { flex: 1; height: 8px; border-radius: 4px;
     background: linear-gradient(90deg, #dc322f, #ebaa28, #28aa5a); }
@@ -104,6 +106,7 @@
       <h2>Scene</h2>
       <select id="scene" aria-label="Scene"></select>
       <div class="note" id="source" style="margin-top:6px"></div>
+      <div class="note credit" id="credit"></div>
     </div>
     <div class="section">
       <h2>Map layer</h2>
@@ -191,7 +194,7 @@ function metricRows(m) {
   if (live.latency_ms_p50 !== undefined) rows.push(["Live latency p50 / p95", `${live.latency_ms_p50} / ${live.latency_ms_p95} ms`]);
   if (live.pct_within_30fps_budget !== undefined) rows.push(["Frames within 30 fps budget", fmt(live.pct_within_30fps_budget, "%", 1)]);
   const seg = ev.live_ate_longest_segment;
-  if (seg && seg.ate_rmse_m !== undefined) rows.push(["Live drift (longest segment)", `${fmt(seg.ate_rmse_m * 100, "cm", 1)} over ${seg.gt_path_length_m} m`]);
+  if (seg && seg.ate_rmse_m !== undefined) rows.push(["Live drift (longest segment)", `${fmt(seg.ate_rmse_m * 100, "cm", 1)} over ${fmt(seg.gt_path_length_m, "m", 1)}`]);
   if (conf.low_confidence_pct !== undefined) rows.push(["Low-confidence points", fmt(conf.low_confidence_pct, "%", 1)]);
   if (splat.test_psnr_db !== undefined) rows.push(["Splat PSNR (held-out views)", fmt(splat.test_psnr_db, "dB")]);
   if (splat.train_time_s !== undefined) rows.push(["Splat training time", `${fmt(splat.train_time_s / 60, "min", 1)} (${splat.gpu})`]);
@@ -302,6 +305,23 @@ function stepWalk(now) {
   controls.target.copy(pos.clone().add(dir.multiplyScalar(0.5)));
 }
 
+// Source credit and licence, built with DOM nodes (no HTML injection from data files).
+function link(text, href) {
+  const a = document.createElement("a");
+  a.textContent = text;
+  if (/^https:\/\//.test(href || "")) { a.href = href; a.target = "_blank"; a.rel = "noopener"; }
+  return a;
+}
+function renderCredit(info) {
+  const el = $("credit");
+  el.replaceChildren();
+  if (!info.attribution) return;
+  el.append("Source: ", info.source_url ? link(info.attribution, info.source_url) : info.attribution);
+  if (info.licence) el.append(", ", info.licence_url ? link(info.licence, info.licence_url) : info.licence);
+  el.append(".");
+  if (info.note) el.append(" " + info.note);
+}
+
 async function loadScene(name) {
   walk = null; $("walk").textContent = "Walk the route"; controls.enabled = true;
   clearMeshes();
@@ -314,7 +334,8 @@ async function loadScene(name) {
   ]);
   current.meta = meta;
   current.traj = traj;
-  $("source").textContent = meta.source || "";
+  $("source").textContent = meta.source ? `Capture: ${meta.source}` : "";
+  renderCredit(meta.info || {});
   $("units").textContent = `Units: ${meta.units}.`;
   const layersEl = $("layers");
   layersEl.innerHTML = "";
@@ -345,7 +366,7 @@ async function init() {
   const sel = $("scene");
   for (const s of idx.scenes) {
     const o = document.createElement("option");
-    o.value = s.name; o.textContent = s.name + (s.source ? ` — ${s.source}` : "");
+    o.value = s.name; o.textContent = s.title || s.name;
     sel.appendChild(o);
   }
   const want = params.get("scene");
