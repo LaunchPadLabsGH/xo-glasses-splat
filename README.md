@@ -100,6 +100,38 @@ xgs train --run runs/tum-desk --device tum_fr1
 xgs export --run runs/tum-desk --name tum-desk --device tum_fr1
 ```
 
+### Windows: running from another drive
+
+WSL keeps its Ubuntu install, and everything in it, on C: by default. This project needs about 15 GB
+(CUDA toolkit, PyTorch, footage and results). To keep it all on another drive (it must be an internal
+NTFS drive, and the target folder must not be compressed), move Ubuntu there before running setup.
+In PowerShell:
+
+```powershell
+wsl --update
+wsl --list --verbose          # note your distribution's name, e.g. Ubuntu
+wsl --shutdown
+wsl --manage Ubuntu --move F:\WSL\Ubuntu
+```
+
+On older WSL versions without `--manage --move`, export and re-import instead. Check that the `.tar`
+file exists and is several GB before running `--unregister`: that step deletes the C: copy.
+
+```powershell
+mkdir F:\WSL
+wsl --export Ubuntu F:\WSL\ubuntu.tar
+wsl --unregister Ubuntu
+wsl --import Ubuntu F:\WSL\Ubuntu F:\WSL\ubuntu.tar
+wsl -d Ubuntu -u root -- bash -c "printf '[user]\ndefault=YOUR_LINUX_USERNAME\n' >> /etc/wsl.conf"
+wsl --shutdown
+```
+
+Without Ubuntu installed yet, install it straight onto F: with
+`wsl --install -d Ubuntu-24.04 --location F:\WSL\Ubuntu`.
+
+Keep the repository inside Ubuntu (e.g. `~/xo-glasses-splat`), not under `/mnt/f`. Windows-drive
+access from WSL is many times slower, and the Ubuntu install itself is now on F:.
+
 All demo scenes end to end: `bash scripts/run_demo.sh`. To view locally:
 `(cd docs && python3 -m http.server 8000)`, then open http://localhost:8000.
 

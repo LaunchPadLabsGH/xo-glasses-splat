@@ -8,7 +8,10 @@
 #      install any NVIDIA driver inside WSL.
 #   2. In PowerShell: `wsl --update`, then open Ubuntu (22.04 or 24.04).
 #   3. Clone this repo inside the WSL filesystem (e.g. ~/xo-glasses-splat), not
-#      under /mnt/c, for much faster file access.
+#      under /mnt/c or /mnt/f, for much faster file access.
+#   4. Short on space on C:? WSL stores Ubuntu on C: by default. Move it to
+#      another NTFS drive first (see "Windows: running from another drive" in
+#      the README). This setup needs about 15 GB.
 #
 # Usage:  bash scripts/setup_wsl_gpu.sh
 set -euo pipefail
@@ -22,6 +25,17 @@ if ! command -v nvidia-smi >/dev/null; then
   exit 1
 fi
 nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv
+
+say "Checking free disk space (about 15 GB needed: CUDA toolkit ~5 GB, PyTorch ~4 GB, data and runs)"
+avail_gb=$(df -Pk "$HOME" | awk 'NR==2 {print int($4 / 1048576)}')
+echo "Free space for this Ubuntu install: ${avail_gb} GB"
+if [ "$avail_gb" -lt 15 ]; then
+  echo "Less than 15 GB free. Free up space, or move this Ubuntu install to a bigger drive" >&2
+  echo "(README: 'Windows: running from another drive'). Set XGS_SKIP_SPACE_CHECK=1 to continue anyway." >&2
+  [ "${XGS_SKIP_SPACE_CHECK:-0}" = 1 ] || exit 1
+fi
+# Do not keep pip's download cache (saves ~3 GB).
+export PIP_NO_CACHE_DIR=1
 
 say "Installing system packages (ffmpeg, build tools)"
 sudo apt-get update -y
@@ -38,6 +52,7 @@ if ! command -v nvcc >/dev/null || ! nvcc --version | grep -qE "release 12\.(8|9
   sudo dpkg -i /tmp/cuda-keyring.deb
   sudo apt-get update -y
   sudo apt-get install -y cuda-toolkit-12-8
+  sudo apt-get clean   # drop downloaded .deb packages (~3 GB)
 fi
 export CUDA_HOME=/usr/local/cuda-12.8
 export PATH="$CUDA_HOME/bin:$PATH"
