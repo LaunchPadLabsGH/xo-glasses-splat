@@ -131,13 +131,13 @@ away and fills up as the copy runs. The C: original is deleted only once the cop
 is lost while you wait. In a second PowerShell window:
 
 ```powershell
-(Get-Item F:\\WSL\\Ubuntu\\ext4.vhdx).Length / 1GB      # run a few times: still growing = still copying
-Get-ChildItem HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Lxss | Get-ItemProperty | Select DistributionName, BasePath
+(Get-Item F:\WSL\Ubuntu\ext4.vhdx).Length / 1GB      # run a few times: still growing = still copying
+Get-ChildItem HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss | Get-ItemProperty | Select DistributionName, BasePath
 ```
 
 The second command shows where WSL currently keeps the distribution; the copy is done when F: reaches
 the size of the `ext4.vhdx` in that folder. Close Docker Desktop, VS Code WSL windows and Ubuntu
-terminals, which hold the disk open. Add `F:\\WSL` as a Windows Security exclusion if antivirus slows
+terminals, which hold the disk open. Add `F:\WSL` as a Windows Security exclusion if antivirus slows
 the copy. Press Ctrl+C only if the F: size has not changed for 15 minutes and F: is idle. Then, if
 `BasePath` still points to C:, delete the partial F: copy and use export/import instead. Never delete
 either `.vhdx` until `wsl -d Ubuntu` starts and your files are there.
